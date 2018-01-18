@@ -12,6 +12,10 @@ func main() {
 	var tape [2147483648]uint32
 	var iPointer int
 	// Read in the program
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: bf [file]")
+		os.Exit(1)
+	}
 	file := os.Args[1]
 	fDesc, err := os.Open(file)
 	if err != nil {
@@ -31,7 +35,7 @@ func main() {
 	rd := bufio.NewReader(os.Stdin)
 	// Just serially read each instruction
 	dPointer := 0
-	for iPointer < len(program) {
+	for iPointer < len(program)-1 {
 		token := program[iPointer]
 		switch token {
 		// TODO: prevent overflow
@@ -48,7 +52,7 @@ func main() {
 			dPointer--
 			iPointer++
 		case '.':
-			fmt.Printf("%v", string(rune(tape[dPointer])))
+			fmt.Print(string(rune(tape[dPointer])))
 			iPointer++
 		case ',':
 			inStr, err := rd.ReadString('\n')
@@ -101,10 +105,9 @@ func getBrackPairs(program []rune) (map[int]int, map[int]int) {
 		if token == '[' {
 			openBracks = append(openBracks, i)
 		}
-
 	}
 	// Now search for "]" from the end
-	for i := len(program) - 1; i >= 0; i++ {
+	for i := len(program) - 1; i >= 0; i-- {
 		if program[i] == ']' {
 			closeBracks = append(closeBracks, i)
 		}
