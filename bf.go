@@ -2,22 +2,34 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 )
 
 func main() {
-	// The tape has as many cells as can be adressed by an int32
-	var tape [2147483648]uint32
-	var iPointer int
-	// Read in the program
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: bf [file]")
+	var file = flag.String("f", "", "file to execute")
+	var tapeSize = flag.Int("m", 0, "amount of memory cells. 0 = unlimited")
+	// If it's 0 make a dynamic slice
+	if *tapeSize == 0 {
+		var tape []uint32
+	}
+	if *tapeSize < 0 {
+		fmt.Println("# of memory cells cannot be 0!")
 		os.Exit(1)
 	}
-	file := os.Args[1]
-	fDesc, err := os.Open(file)
+	if *tapeSize > 0 {
+		var tape = make([]uint32, *tapeSize, *tapeSize)
+	}
+	// The tape has as many cells as can be adressed by an int32
+	var iPointer int
+	// Read in the program
+	if *file == "" {
+		fmt.Println("Usage: bf -f <file>")
+		os.Exit(1)
+	}
+	fDesc, err := os.Open(*file)
 	if err != nil {
 		fmt.Printf("Error while reading file: %v\n", err)
 		os.Exit(1)
